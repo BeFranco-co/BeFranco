@@ -284,7 +284,7 @@ async function verificar(q) {
   try {
     if (/^0x[0-9a-fA-F]{40}$/.test(q)) {
       var hallazgos = [];
-      for (var reg of activos()) {
+      for (var reg of activos().slice().reverse()) {
         var w = words(await call(reg.address, SEL.isVerifiedWallet + addrArg(q)));
         var verified = big(w[0]) === 1n, id = Number(big(w[1]));
         if (id) hallazgos.push({ reg: reg, verified: verified, f: await getFoundation(reg, id) });
@@ -294,7 +294,8 @@ async function verificar(q) {
         var f = ok[0].f;
         showResult(out, "ok", "✓ Fundación verificada: " + esc(f.name),
           '<p class="detail">NIT ' + esc(f.nit) + " · fundación n.º " + f.id + " del " + esc(ok[0].reg.nombre.toLowerCase()) + ".</p>" +
-          '<p class="detail">Huella de los documentos revisados: <span class="mono">' + short(f.docsHash) + "</span>. La fundación confirmó esta billetera con su propia firma.</p>");
+          '<p class="detail">' + (/^0x0+$/.test(f.docsHash) ? "Este registro de prueba no incluyó la huella de los documentos." : 'Huella de los documentos revisados: <span class="mono">' + short(f.docsHash) + "</span>.") +
+          " La fundación confirmó esta billetera con su propia firma." + (ok.length > 1 ? " También está verificada en el " + esc(ok[1].reg.nombre.toLowerCase()) + "." : "") + "</p>");
       } else if (hallazgos.length) {
         var h = hallazgos[0];
         if (h.f.status === 3) showResult(out, "bad", "✕ Sello retirado: " + esc(h.f.name), '<p class="detail">BeFranco revocó la verificación de esta fundación. No dones a esta dirección.</p>');

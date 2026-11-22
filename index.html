@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BeFranco · Ahorra en tres monedas y dona con prueba</title>
+<title>BeFranco · Sé franco con tu dinero</title>
 <meta name="description" content="BeFranco: billetera para ahorrar en pesos, dólares y francos suizos digitales, y donar a fundaciones colombianas verificadas con un registro público.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -23,9 +23,10 @@
   .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:.2px}
   .mark{width:30px;height:30px;border-radius:8px;background:var(--red);display:grid;place-items:center;color:#fff;font-size:16px}
   .hero{padding:48px 0 40px}
-  .hero h1{font-size:clamp(34px,5.2vw,56px);line-height:1.08;margin:0 0 18px;font-weight:800;max-width:820px}
+  .hero h1{font-size:clamp(32px,4.8vw,52px);line-height:1.08;margin:0 0 18px;font-weight:800;max-width:820px}
   .hero h1 span{color:var(--red)}
   .hero p{font-size:19px;color:var(--muted);max-width:640px;margin:0 0 28px}
+  .hero p.motto{font-size:14px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:var(--red);margin:0 0 14px}
   .ctas{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
   .btn{display:inline-block;padding:14px 22px;border-radius:12px;font-weight:700;text-decoration:none;font-size:16px}
   .btn.primary{background:var(--red);color:#fff}
@@ -63,8 +64,9 @@
 
 <main class="wrap">
   <div class="hero">
-    <h1>Ahorra en pesos, dólares y francos suizos. <span>Dona con prueba.</span></h1>
-    <p>Una billetera para proteger tus ahorros en tres monedas y donar a fundaciones colombianas verificadas, con cada donación registrada en público.</p>
+    <p class="motto">Sé franco con tu dinero</p>
+    <h1>Diversifica tu ahorro en pesos, dólares y francos suizos. <span>Ayuda a quienes ayudan, con confianza.</span></h1>
+    <p>Una billetera para que tu ahorro no dependa de una sola moneda, y para donar a fundaciones colombianas verificadas, con cada donación registrada en público.</p>
     <div class="ctas" id="ctas">
       <a class="btn primary" id="join" href="#" target="_blank" rel="noopener">Únete a la lista de espera</a>
       <a class="btn ghost" href="verificador.html">Verificar una fundación</a>
@@ -105,7 +107,7 @@
 
 <script>
   // Pega aquí el enlace de tu formulario de Google (por ejemplo https://forms.gle/xxxx).
-  var FORM_URL = "";
+  var FORM_URL = "https://forms.gle/XqHvA6YZ1PSgxh74A";
 
   var join = document.getElementById("join");
   if (FORM_URL) {
