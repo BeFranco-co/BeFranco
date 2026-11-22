@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BeFranco · Ahorra en tres monedas y dona con prueba</title>
+<meta name="description" content="BeFranco: billetera para ahorrar en pesos, dólares y francos suizos digitales, y donar a fundaciones colombianas verificadas con un registro público.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     PARA ACTIVAR LA LISTA DE ESPERA: pega el enlace de tu
+     formulario de Google entre las comillas de FORM_URL (abajo,
+     en el <script>). Mientras esté vacío, la página muestra
+     "La lista de espera abre pronto".
+     ============================================================ */
+  :root{--ink:#18202b;--paper:#f5f3ee;--white:#fff;--red:#c8102e;--red-soft:#fbe9ec;--muted:#5b6470;--line:#e2ded5;--green:#1d6b45;--green-soft:#e3f2ea}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Manrope,system-ui,Arial,sans-serif;color:var(--ink);background:var(--paper);line-height:1.55}
+  a{color:var(--red)}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+  header{padding:22px 0}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:.2px}
+  .mark{width:30px;height:30px;border-radius:8px;background:var(--red);display:grid;place-items:center;color:#fff;font-size:16px}
+  .hero{padding:48px 0 40px}
+  .hero h1{font-size:clamp(34px,5.2vw,56px);line-height:1.08;margin:0 0 18px;font-weight:800;max-width:820px}
+  .hero h1 span{color:var(--red)}
+  .hero p{font-size:19px;color:var(--muted);max-width:640px;margin:0 0 28px}
+  .ctas{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .btn{display:inline-block;padding:14px 22px;border-radius:12px;font-weight:700;text-decoration:none;font-size:16px}
+  .btn.primary{background:var(--red);color:#fff}
+  .btn.ghost{background:var(--white);color:var(--ink);border:1px solid var(--line)}
+  .soon{font-weight:700;color:var(--muted);padding:14px 0}
+  .hero .note{font-size:14px;color:var(--muted);margin:14px 0 0}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:8px 0 40px}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:24px}
+  .card .label{font-size:12px;font-weight:800;letter-spacing:1.4px;color:var(--red);margin:0 0 8px}
+  .card h3{margin:0 0 8px;font-size:20px;line-height:1.25}
+  .card p{margin:0;color:var(--muted);font-size:15px}
+  section h2{font-size:28px;margin:0 0 6px}
+  section .lead{color:var(--muted);margin:0 0 20px}
+  .proof{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:8px 24px;margin-bottom:40px}
+  .row{display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--line)}
+  .row:last-child{border-bottom:0}
+  .pill{flex:0 0 84px;text-align:center;font-size:12px;font-weight:800;padding:4px 0;border-radius:999px;margin-top:2px}
+  .ok{background:var(--green-soft);color:var(--green)}
+  .no{background:var(--red-soft);color:var(--red)}
+  .row strong{display:block}
+  .row span{color:var(--muted);font-size:15px}
+  .who{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:40px}
+  .box{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:24px}
+  .box h3{margin:0 0 8px;font-size:18px}
+  .box p{margin:0;color:var(--muted);font-size:15px}
+  footer{border-top:1px solid var(--line);padding:24px 0 40px;font-size:14px;color:var(--muted)}
+  footer p{margin:0 0 8px}
+  @media (max-width:760px){.cards,.who{grid-template-columns:1fr}.hero{padding-top:24px}}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <div class="brand"><div class="mark">B</div>BeFranco</div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <h1>Ahorra en pesos, dólares y francos suizos. <span>Dona con prueba.</span></h1>
+    <p>Una billetera para proteger tus ahorros en tres monedas y donar a fundaciones colombianas verificadas, con cada donación registrada en público.</p>
+    <div class="ctas" id="ctas">
+      <a class="btn primary" id="join" href="#" target="_blank" rel="noopener">Únete a la lista de espera</a>
+      <a class="btn ghost" href="verificador.html">Verificar una fundación</a>
+      <a class="btn ghost" href="prototipo.html">Ver el prototipo</a>
+    </div>
+    <p class="note">No pedimos dinero. La lista de espera es solo para avisarte cuando abramos el piloto.</p>
+  </div>
+
+  <div class="cards">
+    <div class="card"><p class="label">AHORRA</p><h3>Pesos que rinden, dólares que equilibran, francos que protegen</h3><p>Francos suizos y dólares digitales, con rendimientos a través de una entidad vigilada.</p></div>
+    <div class="card"><p class="label">VERIFICA</p><h3>Solo fundaciones reales</h3><p>Revisamos cada fundación en registros oficiales y ella confirma su billetera con su propia firma.</p></div>
+    <div class="card"><p class="label">DONA</p><h3>Directo, con recibo público</h3><p>Un contrato inteligente envía cada donación directo a la fundación. Nunca guardamos el dinero.</p></div>
+  </div>
+
+  <section>
+    <h2>El MVP ya funciona en red de prueba</h2>
+    <p class="lead">Contratos desplegados en Ethereum Sepolia, con el código verificado públicamente. Cualquiera puede revisar cada paso.</p>
+    <div class="proof">
+      <div class="row"><div class="pill ok">17 NOV</div><div><strong>Donación a una fundación verificada: llegó directo</strong><span>Registro, confirmación de la billetera por la fundación y donación de 10 francos de prueba. <a href="https://eth-sepolia.blockscout.com/tx/0xf175270769358bf393ae3b5e63698e6f256edb19a0ea2a27667fbcb88772610b" target="_blank" rel="noopener">Ver la donación</a></span></div></div>
+      <div class="row"><div class="pill no">21 NOV</div><div><strong>Donación a una fundación no verificada: rechazada</strong><span>El contrato la bloqueó con el error NotVerified, antes de mover un solo token. <a href="https://eth-sepolia.blockscout.com/tx/0xec1bb34a93d2d6750d16e6352d691a5d2ea789ae113964ea7606d01f842e870e" target="_blank" rel="noopener">Ver el rechazo</a></span></div></div>
+      <div class="row"><div class="pill ok">21 NOV</div><div><strong>Donación en pesos con doble firma</strong><span>El dinero viaja por el banco; en la red quedan la huella del comprobante, la firma de BeFranco y la de la fundación confirmando que lo recibió. Prueba con 50.000 COP simulados. <a href="https://eth-sepolia.blockscout.com/tx/0x660c3385244be66435f4309e20bae639ec8d7a5a2dc1bcdea5a5caad5c59f33a" target="_blank" rel="noopener">Ver la confirmación</a> · <a href="docs/Comprobante_prueba_BeFranco.pdf">Comprobante de prueba</a></span></div></div>
+      <div class="row"><div class="pill ok">GRATIS</div><div><strong>Verificador público de fundaciones</strong><span>Antes de donar desde cualquier billetera, consulta si la dirección es de una fundación verificada. La página lee el contrato directamente en la blockchain. <a href="verificador.html">Abrir el verificador</a></span></div></div>
+      <div class="row"><div class="pill ok">PÚBLICO</div><div><strong>Historial completo de los contratos</strong><span>Todas las operaciones, con fecha, firma y resultado. <a href="https://eth-sepolia.blockscout.com/address/0x3509a1c1EA4fD27f95E1397a92fDA0872FFCa862?tab=txs" target="_blank" rel="noopener">Contrato V1</a> · <a href="https://eth-sepolia.blockscout.com/address/0xCcef9b76E5E1E7c929b730f24ae3866935232629?tab=txs" target="_blank" rel="noopener">Contrato V2</a> · <a href="docs/Evidencias_MVP_BeFranco.pdf">Evidencias en PDF</a></span></div></div>
+    </div>
+  </section>
+
+  <div class="who">
+    <div class="box"><h3>Para quién es</h3><p>Personas que ahorran y quieren proteger su dinero en más de una moneda, freelancers que cobran del exterior, y fundaciones que quieren recibir donaciones de Colombia y del mundo con transparencia.</p></div>
+    <div class="box"><h3>Quiénes somos</h3><p>Un equipo de seis personas de la Universidad Industrial de Santander, con el respaldo del semillero del grupo de investigación Finance &amp; Management (F&amp;M).</p></div>
+  </div>
+</main>
+
+<footer class="wrap">
+  <p><strong>Estado:</strong> prototipo no auditado, solo en red de prueba. Todavía no recibimos dinero real.</p>
+  <p><strong>Tus datos:</strong> si te unes a la lista de espera, usamos tu nombre y tu correo solo para avisarte del piloto, conforme a la Ley 1581 de 2012. Puedes pedir que los borremos cuando quieras.</p>
+  <p><a href="https://github.com/" id="repo">Código en GitHub</a></p>
+</footer>
+
+<script>
+  // Pega aquí el enlace de tu formulario de Google (por ejemplo https://forms.gle/xxxx).
+  var FORM_URL = "";
+
+  var join = document.getElementById("join");
+  if (FORM_URL) {
+    join.href = FORM_URL;
+  } else {
+    var soon = document.createElement("span");
+    soon.className = "soon";
+    soon.textContent = "La lista de espera abre pronto.";
+    join.replaceWith(soon);
+  }
+  // El enlace al repositorio se arma solo a partir de la dirección de GitHub Pages.
+  var host = location.hostname, parts = location.pathname.split("/").filter(Boolean);
+  if (host.endsWith("github.io") && parts.length) {
+    document.getElementById("repo").href = "https://github.com/" + host.split(".")[0] + "/" + parts[0];
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BeFranco · Prototipo de la billetera</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#18202b; --paper:#f5f3ee; --white:#ffffff; --red:#c8102e; --red-soft:#fbe9ec;
+    --muted:#5b6470; --line:#e2ded5; --green:#1d6b45; --green-soft:#e3f2ea; --amber:#a35a00; --amber-soft:#fbf0de;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Manrope,system-ui,Arial,sans-serif;background:#e9e6df;color:var(--ink);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px 12px 40px;gap:14px}
+  .topbar{width:100%;max-width:420px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .demo{font-size:12px;color:var(--amber);background:var(--amber-soft);border:1px solid #f0d9b0;padding:6px 10px;border-radius:999px;font-weight:600}
+  .lang{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--white)}
+  .lang button{border:0;background:none;padding:6px 12px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;color:var(--muted)}
+  .lang button.on{background:var(--ink);color:var(--paper)}
+  .phone{width:100%;max-width:420px;background:var(--paper);border-radius:32px;box-shadow:0 20px 50px rgba(24,32,43,.18);overflow:hidden;display:flex;flex-direction:column;min-height:760px;border:8px solid var(--ink)}
+  header.app{background:var(--ink);color:var(--paper);padding:18px 20px 16px;display:flex;align-items:center;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:.2px}
+  .flag{width:30px;height:30px;background:var(--red);border-radius:6px;position:relative;flex:none}
+  .flag:before,.flag:after{content:"";position:absolute;background:#fff;left:50%;top:50%;transform:translate(-50%,-50%)}
+  .flag:before{width:6px;height:18px}.flag:after{width:18px;height:6px}
+  .hello{font-size:13px;color:#c9ced6}
+  main{flex:1;padding:18px 16px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+  .card{background:var(--white);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px}
+  .card.dark{background:var(--ink);color:var(--paper)}
+  h2{font-size:20px;font-weight:800}
+  h3{font-size:15px;font-weight:700}
+  .small{font-size:12px;color:var(--muted)}
+  .dark .small{color:#aab2bd}
+  .big{font-size:30px;font-weight:800;letter-spacing:-.5px}
+  .row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .bal{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+  .bal:first-of-type{border-top:0}
+  .tag{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+  .tag.ok{background:var(--green-soft);color:var(--green)}
+  .tag.pend{background:var(--amber-soft);color:var(--amber)}
+  .tag.bad{background:var(--red-soft);color:var(--red)}
+  .btns{display:flex;gap:8px;flex-wrap:wrap}
+  button.b{border:0;border-radius:12px;padding:11px 14px;font:inherit;font-weight:700;font-size:14px;cursor:pointer;background:var(--red);color:#fff;flex:1}
+  button.b.sec{background:var(--paper);color:var(--ink);border:1px solid var(--line)}
+  .dark button.b.sec{background:#2a3442;color:var(--paper);border-color:#3a4555}
+  button.b:disabled{opacity:.45;cursor:not-allowed}
+  label{font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px}
+  input,select{width:100%;font:inherit;font-size:14px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--white);color:var(--ink)}
+  input[type=range]{padding:0;border:0;accent-color:var(--red)}
+  .mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;word-break:break-all}
+  .bar{height:10px;background:var(--paper);border-radius:999px;overflow:hidden}
+  .bar>div{height:100%;background:var(--red);border-radius:999px;transition:width .4s}
+  nav{display:grid;grid-template-columns:repeat(4,1fr);background:var(--white);border-top:1px solid var(--line)}
+  nav button{border:0;background:none;padding:10px 2px 12px;font:inherit;font-size:10px;font-weight:700;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
+  nav button svg{width:22px;height:22px}
+  nav button.on{color:var(--red)}
+  .found{border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;cursor:pointer;background:var(--white)}
+  .found.sel{border:2px solid var(--red)}
+  .checks{display:flex;flex-direction:column;gap:4px;font-size:12px}
+  .checks span{display:flex;gap:6px;align-items:center}
+  .alert{border-radius:12px;padding:12px;font-size:13px;line-height:1.45}
+  .alert.ok{background:var(--green-soft);color:var(--green)}
+  .alert.bad{background:var(--red-soft);color:#8f0b20}
+  .alert.warn{background:var(--amber-soft);color:#6e3d00}
+  .seg{display:flex;background:var(--paper);border-radius:12px;padding:4px;gap:4px}
+  .seg button{flex:1;border:0;background:none;padding:8px;border-radius:9px;font:inherit;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer}
+  .seg button.on{background:var(--white);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{text-align:left;color:var(--muted);font-weight:700;padding:6px 4px;border-bottom:1px solid var(--line)}
+  td{padding:8px 4px;border-bottom:1px solid var(--line);vertical-align:top}
+  .modal{position:fixed;inset:0;background:rgba(24,32,43,.55);display:none;align-items:center;justify-content:center;padding:20px;z-index:10}
+  .modal.show{display:flex}
+  .modal .card{width:100%;max-width:380px}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:12px;font-size:13px;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;z-index:20;max-width:90%}
+  .toast.show{opacity:1}
+  .vcard{background:linear-gradient(135deg,#18202b 0%,#2c3a4d 60%,#c8102e 140%);color:#f5f3ee;border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:18px;aspect-ratio:1.586;justify-content:space-between;transition:filter .3s}
+  .vcard.frozen{filter:grayscale(1) brightness(.8)}
+  .vcard .pan{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:21px;letter-spacing:2px}
+  .vcard .lbl{font-size:10px;color:#aab2bd;text-transform:uppercase;letter-spacing:1px}
+  .vcard .brandc{display:flex;align-items:center;gap:8px;font-weight:800}
+  .flag.sm{width:22px;height:22px;border-radius:5px}.flag.sm:before{width:4px;height:13px}.flag.sm:after{width:13px;height:4px}
+  .switch{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px;font-weight:600}
+  .switch input{width:auto;accent-color:var(--red);transform:scale(1.3)}
+  .note{font-size:12px;color:var(--muted);max-width:420px;text-align:center;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <span class="demo" data-t="demo"></span>
+  <div class="lang"><button id="l-es" class="on">ES</button><button id="l-en">EN</button></div>
+</div>
+
+<div class="phone">
+  <header class="app">
+    <div class="brand"><span class="flag"></span>BeFranco</div>
+    <span class="hello" data-t="hello"></span>
+  </header>
+  <main id="view"></main>
+  <nav>
+    <button data-tab="home" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span data-t="nHome"></span></button>
+    <button data-tab="save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M16 12h2M3 10h18"/></svg><span data-t="nSave"></span></button>
+    <button data-tab="card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20M6 15h4"/></svg><span data-t="nCard"></span></button>
+    <button data-tab="give"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9z"/></svg><span data-t="nGive"></span></button>
+    
+  </nav>
+</div>
+<p class="note" data-t="foot"></p>
+
+<div class="modal" id="modal"><div class="card" id="modalCard"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ---------- Datos de ejemplo (simulados) ----------
+const RATE = { USD_COP: 3130, CHF_COP: 3900 };   // tasas de ejemplo, no reales en tiempo real
+const FEE = 0.01;                                 // margen de conversión de ejemplo (1 %)
+const APY_CHF = 0;                                // el franco suizo casi no rinde (BNS en 0 %)
+const APY_USD = 0.03;                             // rendimiento neto de ejemplo en dólares (bonos del Tesoro tokenizados)
+const APY_COP = 0.10;                             // rendimiento de ejemplo del bolsillo en pesos (entidad vigilada aliada)
+
+const FOUNDATIONS = [
+  { id:'f1', name:'Fundación Agua Limpia Guanentá', cause:{es:'Agua potable rural',en:'Rural clean water'}, city:'San Gil',
+    addr:'0x7A3f9c2E41b8D05a6E19c4F2B7d3A8e5C1f04B92', checks:{camara:true,dian:true,sig:true} },
+  { id:'f2', name:'Fundación Lectores del Chicamocha', cause:{es:'Educación y lectura infantil',en:'Children’s education and reading'}, city:'Bucaramanga',
+    addr:'0x2C91bE07fA4d3398C5e6A1b0D2f7E9c84a6B13D5', checks:{camara:true,dian:true,sig:true} },
+  { id:'f3', name:'Fundación Manos Solidarias', cause:{es:'Alimentación de adultos mayores',en:'Meals for older adults'}, city:'Socorro',
+    addr:'0x9E4b2D8c1A7f60e3B5C9d2F1a8E7b4c6D0f3A217', checks:{camara:true,dian:true,sig:false} },
+];
+const SCAM_ADDR = '0x7A3f9c1D02c7E44a1F08b3C6e2A9d7F5B8e14B92'; // se parece a la de f1 al inicio y al final
+
+const state = {
+  lang:'es', tab:'home',
+  cop: 850000, usdc: 120, chf: 45,
+  pocket: { chf: 380, goal: 1500, cop: 2000000, usd: 300, donatePct: 10, foundation:'f1', months:0, earned:0 },
+  give: { sub:'found', mode:'user', foundation:'f1', addr:'', amount:10, ccy:'CHF' },
+  card: { online:true, nfc:true, intl:true, frozen:false, source:'CHF', roundup:true, roundF:'f1', shown:false, cvv:'', wallet:false, moves:[] },
+  sends: [],
+  ledger: []
+};
+
+// ---------- Textos ES / EN ----------
+const T = {
+ es:{
+  demo:'Prototipo · datos simulados, no mueve dinero real', hello:'Hola, Jorge',
+  nHome:'Inicio', nCard:'Tarjeta', subFound:'Fundaciones', subLed:'Transparencia',
+  send:'Enviar dinero', sendT:'Enviar dinero', toUser:'A usuario BeFranco', toWallet:'A una billetera', recUser:'Celular o @usuario', recWallet:'Dirección de la billetera (0x…)', ccy:'Moneda', sendBtn:'Enviar', sendFree:'Sin costo entre usuarios BeFranco. Llega al instante.', sendChain:'Revisa bien la dirección: las transferencias en blockchain no se pueden reversar.', badFmt:'Dirección con formato inválido.', isFound:'Esta dirección es de una fundación verificada. Para donar usa la sección Donar y quedará en el registro público.', recent:'Movimientos recientes', noSends:'Aún no has enviado dinero.', sent:'Envío simulado exitoso', needRec:'Escribe el destinatario', purposeQ:'¿Para qué es este envío? (opcional)', pPay:'Pago', pDon:'Donación', pOther:'Otro', tryVer:'Probar: fundación', tryLook:'Probar: parecida', tryUnk:'Probar: desconocida', isVer:'✓ Esta dirección es de {f}, fundación verificada. Si es una donación, hazla con recibo público.', donBtn:'Donar con recibo público', isPend:'Esta dirección es de {f}, que aún está en verificación. Todavía no puede recibir donaciones con recibo público.', notVerDon:'⚠ Esta dirección no pertenece a ninguna fundación verificada en BeFranco. Si quieres donar, busca la fundación por su nombre.', findBtn:'Buscar en fundaciones verificadas', ackTxt:'Entiendo el riesgo y quiero enviar de todas formas',
+  virtual:'Virtual', holder:'Titular', exp:'Vence', show:'Ver datos', hide:'Ocultar datos', freeze:'Congelar tarjeta', unfreeze:'Descongelar', frozenT:'Tarjeta congelada: no se aprobarán compras.',
+  payWith:'Pagar con', payTxt:'Compra en cualquier comercio en línea. Al pagar convertimos desde el saldo que elijas.',
+  dynCvv:'CVV dinámico: cambia cada vez que consultas los datos.',
+  walletT:'Pagos sin contacto', walletTxt:'Agrega la tarjeta a la billetera de tu celular y paga acercándolo al datáfono.', addApple:'Agregar a Apple Pay', addGoogle:'Agregar a Google Wallet', added:'Agregada a la billetera del celular',
+  walletModal:'Tokenización (simulada): el celular guarda un código sustituto. Tu número real nunca se comparte con el comercio.',
+  ctrlT:'Controles de la tarjeta', ctrlTxt:'Activa o desactiva cada función cuando quieras.', cOnline:'Compras en línea', cNfc:'Pagos sin contacto', cIntl:'Compras en comercios del exterior', offOnline:'Compra rechazada: compras en línea desactivadas', offNfc:'Pago rechazado: pagos sin contacto desactivados',
+  roundT:'Redondeo solidario', roundTxt:'Cada compra se redondea al siguiente franco y la diferencia se dona a la fundación que elijas.',
+  simBuy:'Simular compra', buyOnline:'Compra en línea · $85.000', buyNfc:'Pago sin contacto · $12.500', moves:'Movimientos de la tarjeta', noMoves:'Sin compras aún.',
+  blocked:'Compra rechazada: tarjeta congelada', bought:'Compra aprobada', storeOn:'Tienda en línea', storeNfc:'Café (sin contacto)', oRound:'Redondeo solidario',
+  cardNote:'La tarjeta real se emitiría con un socio emisor licenciado (por ejemplo, Pomelo).', nSave:'Ahorro', nGive:'Donar', nLedger:'Transparencia',
+  foot:'BeFranco (BF) · Prototipo para la convocatoria AIT Colombia 5. Tasas, rendimientos y fundaciones son de ejemplo.',
+  total:'Saldo total estimado', lCOP:'Peso colombiano', lUSD:'Dólar digital', lCHF:'Franco suizo digital', balances:'Tus saldos', topup:'Recargar pesos', convert:'Convertir a CHF',
+  rateNote:'Tasas de ejemplo: 1 USD = $3.130 · 1 CHF = $3.900',
+  why:'¿Por qué francos suizos?', whyTxt:'El franco suizo es una de las monedas refugio más estables. Diversifica tu ahorro más allá del dólar.',
+  topupT:'Recargar con PSE (simulado)', amountCop:'Monto en pesos', confirm:'Confirmar', cancel:'Cancelar',
+  convT:'Convertir a francos suizos', from:'Desde', receive:'Recibirás aprox.', fee:'Comisión BeFranco (1 %)',
+  pocketT:'Bolsillo: Viaje a Suiza', goal:'Meta', apy:'Sin rendimiento: el franco protege, no rinde', usdT:'Bolsillo en dólares con rendimiento', usdApy:'Rendimiento neto de ejemplo: 3 % anual · bonos del Tesoro de EE. UU. tokenizados', addUsd:'Mover 20 USDC al bolsillo', balance:'Equilibrio (USD)', usdRisk:'No es un depósito: sin seguro de Fogafín. Riesgo del fondo y del contrato.', copT:'Bolsillo en pesos con rendimiento', copApy:'Rendimiento de ejemplo: 10 % E.A. · ofrecido por una entidad vigilada aliada', mix:'Tu mezcla de ahorro', mixTxt:'Tus pesos rinden, tus dólares equilibran y tus francos te protegen. Tú decides la mezcla.', addCop:'Mover $200.000 al bolsillo', protect:'Protección (CHF)', yieldL:'Rendimiento (COP)', earnedCop:'Rendimientos acumulados (en pesos)',
+  addPocket:'Mover 20 CHF al bolsillo', donPct:'% de tus rendimientos que donas', toF:'Fundación beneficiaria',
+  sim:'Simular 1 mes', simTxt:'Simula un mes: los bolsillos en pesos y en dólares generan rendimiento y la parte que elegiste se dona automáticamente a la fundación, con registro público.',
+  earned:'Rendimientos acumulados', months:'Meses simulados',
+  dirT:'Fundaciones verificadas', dirTxt:'Solo las fundaciones que pasan la verificación reciben el sello BeFranco y una dirección certificada.',
+  cCam:'Existe en Cámara de Comercio', cDian:'Régimen tributario especial (DIAN)', cSig:'Firmó con su billetera (prueba de control)',
+  verified:'Verificada', pending:'En verificación',
+  modeUser:'Desde mi saldo', modeExt:'Donante internacional',
+  pasteL:'O pega una dirección para verificarla', tryScam:'Probar dirección sospechosa', tryReal:'Probar dirección real',
+  amount:'Monto', donate:'Donar', extTxt:'Comparte esta dirección certificada con donantes de cualquier país. Pueden enviar USDC o francos suizos digitales desde cualquier billetera.',
+  simExt:'Simular donación desde Suiza', copy:'Copiar dirección',
+  okAddr:'Dirección certificada de', badAddr:'Esta dirección NO está verificada en BeFranco. No envíes fondos.',
+  lookalike:'¡Alerta de suplantación! Esta dirección se parece a la de {f} (mismo inicio y final), pero no es igual. Es una técnica común de estafa.',
+  pendAddr:'Esta fundación aún no completa la verificación. Las donaciones se habilitan cuando firme con su billetera.',
+  insufficient:'Saldo insuficiente', done:'Donación registrada',
+  realT:'Prueba real en red de prueba (Ethereum Sepolia)', realTxt:'El 17 de noviembre de 2026 el contrato de BeFranco registró una fundación de prueba, la fundación confirmó su billetera firmando con ella y recibió una donación de 10 tCHF (token de prueba, sin valor real).', realTx:'Ver la donación en Blockscout', realC:'Ver el contrato',
+  donFree:'Donar es gratis: la donación llega completa a la fundación. La fundación paga una comisión solo cuando retira a su cuenta bancaria o convierte a otra moneda.',
+  ledT:'Registro público de donaciones', ledTxt:'Cada donación queda en blockchain. Cualquier persona puede verificarla.',
+  thW:'Cuándo', thF:'Fundación', thA:'Monto', thO:'Origen', thTx:'Transacción',
+  totals:'Total recibido por fundación', none:'Aún no hay donaciones.',
+  oUser:'Usuario BF', oAuto:'Auto (rendimientos)', oExt:'Donante en Suiza',
+  copied:'Dirección copiada', topped:'Recarga simulada exitosa', converted:'Conversión simulada exitosa', moved:'Movido al bolsillo', month:'Mes simulado: rendimiento y donación registrados'
+ },
+ en:{
+  demo:'Prototype · simulated data, no real money moves', hello:'Hi, Jorge',
+  nHome:'Home', nCard:'Card', subFound:'Foundations', subLed:'Transparency',
+  send:'Send money', sendT:'Send money', toUser:'To a BeFranco user', toWallet:'To a wallet', recUser:'Phone or @username', recWallet:'Wallet address (0x…)', ccy:'Currency', sendBtn:'Send', sendFree:'Free between BeFranco users. Arrives instantly.', sendChain:'Double-check the address: blockchain transfers cannot be reversed.', badFmt:'Invalid address format.', isFound:'This address belongs to a verified foundation. To donate, use the Give section so it is recorded publicly.', recent:'Recent activity', noSends:'You have not sent money yet.', sent:'Simulated transfer successful', needRec:'Enter the recipient', purposeQ:'What is this transfer for? (optional)', pPay:'Payment', pDon:'Donation', pOther:'Other', tryVer:'Try: foundation', tryLook:'Try: lookalike', tryUnk:'Try: unknown', isVer:'✓ This address belongs to {f}, a verified foundation. If this is a donation, make it with a public receipt.', donBtn:'Donate with public receipt', isPend:'This address belongs to {f}, still under verification. It cannot receive donations with a public receipt yet.', notVerDon:'⚠ This address does not belong to any foundation verified on BeFranco. If you want to donate, search for the foundation by name.', findBtn:'Search verified foundations', ackTxt:'I understand the risk and want to send anyway',
+  virtual:'Virtual', holder:'Cardholder', exp:'Expires', show:'Show details', hide:'Hide details', freeze:'Freeze card', unfreeze:'Unfreeze', frozenT:'Card frozen: purchases will be declined.',
+  payWith:'Pay with', payTxt:'Shop at any online store. At checkout we convert from the balance you choose.',
+  dynCvv:'Dynamic CVV: it changes every time you view the details.',
+  walletT:'Contactless payments', walletTxt:'Add the card to your phone wallet and tap to pay.', addApple:'Add to Apple Pay', addGoogle:'Add to Google Wallet', added:'Added to phone wallet',
+  walletModal:'Tokenization (simulated): the phone stores a substitute code. Your real card number is never shared with the merchant.',
+  ctrlT:'Card controls', ctrlTxt:'Turn each feature on or off whenever you want.', cOnline:'Online purchases', cNfc:'Contactless payments', cIntl:'Purchases from foreign merchants', offOnline:'Declined: online purchases are turned off', offNfc:'Declined: contactless payments are turned off',
+  roundT:'Solidarity round-up', roundTxt:'Each purchase is rounded up to the next franc and the difference goes to the foundation you choose.',
+  simBuy:'Simulate a purchase', buyOnline:'Online purchase · COP 85,000', buyNfc:'Contactless payment · COP 12,500', moves:'Card activity', noMoves:'No purchases yet.',
+  blocked:'Purchase declined: card frozen', bought:'Purchase approved', storeOn:'Online store', storeNfc:'Café (contactless)', oRound:'Solidarity round-up',
+  cardNote:'The real card would be issued with a licensed issuing partner (for example, Pomelo).', nSave:'Savings', nGive:'Give', nLedger:'Transparency',
+  foot:'BeFranco (BF) · Prototype for the AIT Colombia 5 call. Rates, yields and foundations are examples.',
+  total:'Estimated total balance', lCOP:'Colombian peso', lUSD:'Digital dollar', lCHF:'Digital Swiss franc', balances:'Your balances', topup:'Top up pesos', convert:'Convert to CHF',
+  rateNote:'Example rates: 1 USD = COP 3,130 · 1 CHF = COP 3,900',
+  why:'Why Swiss francs?', whyTxt:'The Swiss franc is one of the most stable safe-haven currencies. Diversify your savings beyond the dollar.',
+  topupT:'Top up via PSE (simulated)', amountCop:'Amount in pesos', confirm:'Confirm', cancel:'Cancel',
+  convT:'Convert to Swiss francs', from:'From', receive:'You will receive approx.', fee:'BeFranco fee (1%)',
+  pocketT:'Pocket: Trip to Switzerland', goal:'Goal', apy:'No yield: the franc protects, it does not earn', usdT:'Dollar pocket with yield', usdApy:'Example net yield: 3% a year · tokenized US Treasury bills', addUsd:'Move 20 USDC to pocket', balance:'Balance (USD)', usdRisk:'Not a deposit: no deposit insurance. Fund and contract risk.', copT:'Peso pocket with yield', copApy:'Example yield: 10% p.a. · offered by a regulated partner', mix:'Your savings mix', mixTxt:'Your pesos earn, your dollars balance and your francs protect. You choose the mix.', addCop:'Move COP 200,000 to pocket', protect:'Protection (CHF)', yieldL:'Yield (COP)', earnedCop:'Accumulated yield (in pesos)',
+  addPocket:'Move 20 CHF to pocket', donPct:'% of your yield you donate', toF:'Beneficiary foundation',
+  sim:'Simulate 1 month', simTxt:'Simulates one month: the peso and dollar pockets earn yield and your chosen share is donated automatically to the foundation, with a public record.',
+  earned:'Accumulated yield', months:'Simulated months',
+  dirT:'Verified foundations', dirTxt:'Only foundations that pass verification get the BeFranco seal and a certified address.',
+  cCam:'Registered with the Chamber of Commerce', cDian:'Special tax regime (DIAN)', cSig:'Signed with its wallet (proof of control)',
+  verified:'Verified', pending:'Under review',
+  modeUser:'From my balance', modeExt:'International donor',
+  pasteL:'Or paste an address to check it', tryScam:'Try a suspicious address', tryReal:'Try a real address',
+  amount:'Amount', donate:'Donate', extTxt:'Share this certified address with donors in any country. They can send USDC or digital Swiss francs from any wallet.',
+  simExt:'Simulate a donation from Switzerland', copy:'Copy address',
+  okAddr:'Certified address of', badAddr:'This address is NOT verified on BeFranco. Do not send funds.',
+  lookalike:'Impersonation alert! This address looks like {f}’s (same start and end) but it is different. This is a common scam technique.',
+  pendAddr:'This foundation has not finished verification. Donations open once it signs with its wallet.',
+  insufficient:'Insufficient balance', done:'Donation recorded',
+  realT:'Live test on a testnet (Ethereum Sepolia)', realTxt:'On 17 November 2026 the BeFranco contract registered a test foundation, the foundation confirmed its wallet by signing with it, and it received a donation of 10 tCHF (a test token with no real value).', realTx:'View the donation on Blockscout', realC:'View the contract',
+  donFree:'Donating is free: the full donation reaches the foundation. The foundation pays a fee only when it withdraws to its bank account or converts to another currency.',
+  ledT:'Public donation ledger', ledTxt:'Every donation is recorded on the blockchain. Anyone can verify it.',
+  thW:'When', thF:'Foundation', thA:'Amount', thO:'Source', thTx:'Transaction',
+  totals:'Total received per foundation', none:'No donations yet.',
+  oUser:'BF user', oAuto:'Auto (yield)', oExt:'Donor in Switzerland',
+  copied:'Address copied', topped:'Simulated top-up successful', converted:'Simulated conversion successful', moved:'Moved to pocket', month:'Simulated month: yield and donation recorded'
+ }
+};
+const t = k => T[state.lang][k] ?? k;
+
+// ---------- Utilidades ----------
+const fmtCOP = n => '$' + Math.round(n).toLocaleString(state.lang==='es'?'es-CO':'en-US');
+const fmt2 = n => n.toLocaleString(state.lang==='es'?'es-CO':'en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const short = a => a.slice(0,8)+'…'+a.slice(-6);
+const fById = id => FOUNDATIONS.find(f=>f.id===id);
+const isVerified = f => f.checks.camara && f.checks.dian && f.checks.sig;
+const hex = n => Array.from(crypto.getRandomValues(new Uint8Array(n))).map(b=>b.toString(16).padStart(2,'0')).join('');
+const totalCOP = () => state.cop + state.pocket.cop + (state.usdc+state.pocket.usd)*RATE.USD_COP + (state.chf+state.pocket.chf)*RATE.CHF_COP;
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>el.classList.remove('show'),2200);}
+function record(fid, amount, ccy, origin){ state.ledger.unshift({ when:new Date(), fid, amount, ccy, origin, tx:'0x'+hex(32) }); }
+
+// Seed: un par de donaciones de ejemplo
+record('f2', 25, 'USDC', 'oExt'); state.ledger[0].when = new Date(Date.now()-86400000*2);
+record('f1', 3.5, 'CHF', 'oAuto'); state.ledger[0].when = new Date(Date.now()-86400000);
+
+// ---------- Verificación de direcciones ----------
+function checkAddress(addr){
+  const a = addr.trim();
+  if(!a) return null;
+  const exact = FOUNDATIONS.find(f=>f.addr.toLowerCase()===a.toLowerCase());
+  if(exact) return isVerified(exact) ? {kind:'ok', f:exact} : {kind:'pend', f:exact};
+  const look = FOUNDATIONS.find(f=> a.slice(0,6).toLowerCase()===f.addr.slice(0,6).toLowerCase() && a.slice(-4).toLowerCase()===f.addr.slice(-4).toLowerCase());
+  if(look) return {kind:'look', f:look};
+  return {kind:'bad'};
+}
+
+// ---------- Vistas ----------
+function viewHome(){
+  return `
+  <div class="card dark">
+    <span class="small">${t('total')}</span>
+    <span class="big">${fmtCOP(totalCOP())}</span>
+    <span class="small">${t('rateNote')}</span>
+    <div class="btns"><button class="b" onclick="openTopup()">${t('topup')}</button><button class="b sec" onclick="openConvert()">${t('convert')}</button></div>
+    <button class="b sec" onclick="openSend()">↗ ${t('send')}</button>
+  </div>
+  <div class="card">
+    <h3>${t('balances')}</h3>
+    <div class="bal"><div><b>COP</b><div class="small">${t('lCOP')}</div></div><b>${fmtCOP(state.cop)}</b></div>
+    <div class="bal"><div><b>USDC</b><div class="small">${t('lUSD')}</div></div><b>${fmt2(state.usdc)}</b></div>
+    <div class="bal"><div><b>CHF</b><div class="small">${t('lCHF')}</div></div><b>${fmt2(state.chf)}</b></div>
+    <div class="bal"><div><b>CHF · ${t('pocketT').split(': ')[1]}</b><div class="small">${t('apy')}</div></div><b>${fmt2(state.pocket.chf)}</b></div>
+    <div class="bal"><div><b>USDC · ${t('usdT')}</b><div class="small">3 %</div></div><b>${fmt2(state.pocket.usd)}</b></div>
+    <div class="bal"><div><b>COP · ${t('copT')}</b><div class="small">10 % E.A.</div></div><b>${fmtCOP(state.pocket.cop)}</b></div>
+  </div>
+  <div class="card">
+    <h3>${t('recent')}</h3>
+    ${state.sends.length?state.sends.slice(0,5).map(x=>`<div class="bal"><div><b>${x.to}</b><div class="small">${x.kind==='user'?t('toUser'):t('toWallet')}</div></div><b>− ${x.ccy==='COP'?fmtCOP(x.amount):fmt2(x.amount)+' '+x.ccy}</b></div>`).join(''):`<p class="small">${t('noSends')}</p>`}
+  </div>
+  <div class="card">
+    <h3>${t('why')}</h3>
+    <p class="small" style="font-size:13px;line-height:1.5">${t('whyTxt')}</p>
+  </div>`;
+}
+
+function viewSave(){
+  const p = state.pocket, pct = Math.min(100, p.chf/p.goal*100);
+  return `
+  <div class="card">
+    <div class="row"><h2>${t('pocketT')}</h2><span class="tag ok">CHF</span></div>
+    <span class="big">${fmt2(p.chf)} CHF</span>
+    <div class="bar"><div style="width:${pct}%"></div></div>
+    <div class="row small"><span>${t('goal')}: ${fmt2(p.goal)} CHF</span><span>${pct.toFixed(0)} %</span></div>
+    <span class="small">${t('apy')}</span>
+    <button class="b sec" onclick="movePocket()" ${state.chf<20?'disabled':''}>${t('addPocket')}</button>
+  </div>
+  <div class="card">
+    <div class="row"><h2>${t('copT')}</h2><span class="tag pend">COP</span></div>
+    <span class="big">${fmtCOP(p.cop)}</span>
+    <span class="small">${t('copApy')}</span>
+    <button class="b sec" onclick="moveCop()" ${state.cop<200000?'disabled':''}>${t('addCop')}</button>
+  </div>
+  <div class="card">
+    <div class="row"><h2>${t('usdT')}</h2><span class="tag ok" style="background:#e7f1fb;color:#1f4e8c">USD</span></div>
+    <span class="big">${fmt2(p.usd)} USDC</span>
+    <span class="small">${t('usdApy')}</span>
+    <span class="small" style="color:var(--amber)">${t('usdRisk')}</span>
+    <button class="b sec" onclick="moveUsd()" ${state.usdc<20?'disabled':''}>${t('addUsd')}</button>
+  </div>
+  <div class="card">
+    <h3>${t('mix')}</h3>
+    ${(()=>{const c=p.chf*RATE.CHF_COP, u=p.usd*RATE.USD_COP, tot=c+u+p.cop||1, a=c/tot*100, b=u/tot*100, d=p.cop/tot*100; return `<div style="display:flex;height:12px;border-radius:999px;overflow:hidden"><div style="width:${a}%;background:#c8102e"></div><div style="width:${b}%;background:#1f4e8c"></div><div style="width:${d}%;background:#e8a33d"></div></div><div class="row small" style="flex-wrap:wrap"><span><b style="color:#c8102e">■</b> ${t('protect')}: ${a.toFixed(0)} %</span><span><b style="color:#1f4e8c">■</b> ${t('balance')}: ${b.toFixed(0)} %</span><span><b style="color:#e8a33d">■</b> ${t('yieldL')}: ${d.toFixed(0)} %</span></div>`;})()}
+    <p class="small" style="line-height:1.5">${t('mixTxt')}</p>
+  </div>
+  <div class="card">
+    <label>${t('donPct')}: <b style="color:var(--red)">${p.donatePct} %</b></label>
+    <input type="range" min="0" max="100" step="5" value="${p.donatePct}" oninput="state.pocket.donatePct=+this.value;this.previousElementSibling.querySelector('b').textContent=this.value+' %'">
+    <label>${t('toF')}</label>
+    <select onchange="state.pocket.foundation=this.value">
+      ${FOUNDATIONS.filter(isVerified).map(f=>`<option value="${f.id}" ${f.id===p.foundation?'selected':''}>${f.name} (demo)</option>`).join('')}
+    </select>
+    <p class="small" style="line-height:1.5">${t('simTxt')}</p>
+    <button class="b" onclick="simMonth()">${t('sim')}</button>
+    <div class="row small"><span>${t('earnedCop')}: <b>${fmtCOP(p.earned)}</b></span><span>${t('months')}: <b>${p.months}</b></span></div>
+  </div>`;
+}
+
+function foundationCard(f, selectable){
+  const v = isVerified(f), g = state.give;
+  return `<div class="found ${selectable&&g.foundation===f.id?'sel':''}" ${selectable?`onclick="pickF('${f.id}')"`:''}>
+    <div class="row"><h3>${f.name} <span class="small">(demo)</span></h3>${v?`<span class="tag ok">✓ ${t('verified')}</span>`:`<span class="tag pend">… ${t('pending')}</span>`}</div>
+    <span class="small">${f.cause[state.lang]} · ${f.city}</span>
+    <div class="checks">
+      <span>${f.checks.camara?'✅':'⏳'} ${t('cCam')}</span>
+      <span>${f.checks.dian?'✅':'⏳'} ${t('cDian')}</span>
+      <span>${f.checks.sig?'✅':'⏳'} ${t('cSig')}</span>
+    </div>
+    <span class="mono">${f.addr}</span>
+  </div>`;
+}
+
+function addrAlert(){
+  const r = checkAddress(state.give.addr);
+  if(!r) return '';
+  if(r.kind==='ok') return `<div class="alert ok">✓ ${t('okAddr')} <b>${r.f.name}</b>.</div>`;
+  if(r.kind==='pend') return `<div class="alert warn">${t('pendAddr')}</div>`;
+  if(r.kind==='look') return `<div class="alert bad">⚠ ${t('lookalike').replace('{f}','<b>'+r.f.name+'</b>')}</div>`;
+  return `<div class="alert bad">⚠ ${t('badAddr')}</div>`;
+}
+
+function viewGive(){
+  const g = state.give, f = fById(g.foundation);
+  const target = g.addr ? checkAddress(g.addr) : (isVerified(f)?{kind:'ok',f}:{kind:'pend',f});
+  const canDonate = target && target.kind==='ok';
+  const userBlock = `
+    <div class="card">
+      <label>${t('pasteL')}</label>
+      <input id="addrIn" class="mono" placeholder="0x…" value="${g.addr}" oninput="state.give.addr=this.value;document.getElementById('alertBox').innerHTML=addrAlert();updateDonateBtn()">
+      <div class="btns"><button class="b sec" onclick="setAddr(SCAM_ADDR)">${t('tryScam')}</button><button class="b sec" onclick="setAddr(FOUNDATIONS[1].addr)">${t('tryReal')}</button></div>
+      <div id="alertBox">${addrAlert()}</div>
+      <div class="row" style="gap:8px">
+        <div style="flex:1"><label>${t('amount')}</label><input type="number" min="1" value="${g.amount}" oninput="state.give.amount=+this.value"></div>
+        <div style="width:110px"><label>&nbsp;</label><select onchange="state.give.ccy=this.value"><option ${g.ccy==='CHF'?'selected':''}>CHF</option><option ${g.ccy==='USDC'?'selected':''}>USDC</option></select></div>
+      </div>
+      <button class="b" id="donateBtn" onclick="donate()" ${canDonate?'':'disabled'}>${t('donate')}</button>
+      <p class="small" style="font-size:12px;line-height:1.5;margin-top:8px">${t('donFree')}</p>
+    </div>`;
+  const extBlock = `
+    <div class="card">
+      <p class="small" style="font-size:13px;line-height:1.5">${t('extTxt')}</p>
+      ${isVerified(f)?`<div class="alert ok">✓ ${t('okAddr')} <b>${f.name}</b><br><span class="mono">${f.addr}</span></div>
+      <div class="btns"><button class="b sec" onclick="copyAddr('${f.addr}')">${t('copy')}</button><button class="b" onclick="simExt()">${t('simExt')}</button></div>`
+      :`<div class="alert warn">${t('pendAddr')}</div>`}
+    </div>`;
+  const subs = `<div class="seg"><button class="${g.sub==='found'?'on':''}" onclick="state.give.sub='found';render()">${t('subFound')}</button><button class="${g.sub==='led'?'on':''}" onclick="state.give.sub='led';render()">${t('subLed')}</button></div>`;
+  if(g.sub==='led') return subs + viewLedger();
+  return subs + `
+  <div class="card"><h2>${t('dirT')}</h2><p class="small" style="font-size:13px;line-height:1.5">${t('dirTxt')}</p></div>
+  ${FOUNDATIONS.map(x=>foundationCard(x,true)).join('')}
+  <div class="seg"><button class="${g.mode==='user'?'on':''}" onclick="state.give.mode='user';render()">${t('modeUser')}</button><button class="${g.mode==='ext'?'on':''}" onclick="state.give.mode='ext';render()">${t('modeExt')}</button></div>
+  ${g.mode==='user'?userBlock:extBlock}`;
+}
+
+function viewCard(){
+  const c=state.card;
+  const src=['CHF','USDC','COP'].map(x=>`<button class="${c.source===x?'on':''}" onclick="state.card.source='${x}';render()">${x}</button>`).join('');
+  const moves=c.moves.map(m=>`<div class="bal"><div><b>${t(m.store)}</b><div class="small">${fmtCOP(m.cop)} → ${fmt2(m.paid)} ${m.ccy}${m.round?` · ❤ ${fmt2(m.round)} CHF`:''}</div></div><span class="tag ${m.ok?'ok':'bad'}">${m.ok?'✓':'✕'}</span></div>`).join('');
+  return `
+  <div class="vcard ${c.frozen?'frozen':''}">
+    <div class="row"><span class="brandc"><span class="flag sm"></span>BeFranco</span><span class="small" style="color:#c9ced6">${t('virtual')}</span></div>
+    <div class="pan">${c.shown?'0000 1111 2222 5821':'•••• •••• •••• 5821'}</div>
+    <div class="row" style="font-size:14px;font-weight:700">
+      <div><span class="lbl">${t('holder')}</span><br>JORGE A SANTANA</div>
+      <div><span class="lbl">${t('exp')}</span><br>${c.shown?'11/29':'••/••'}</div>
+      <div><span class="lbl">CVV</span><br>${c.shown?c.cvv:'•••'}</div>
+    </div>
+  </div>
+  <div class="btns"><button class="b sec" onclick="toggleShow()">${c.shown?t('hide'):t('show')}</button><button class="b sec" onclick="state.card.frozen=!state.card.frozen;render()">${c.frozen?t('unfreeze'):t('freeze')}</button></div>
+  ${c.frozen?`<div class="alert warn">${t('frozenT')}</div>`:''}
+  <p class="small" style="text-align:center">${t('dynCvv')}</p>
+  <div class="card"><h3>${t('ctrlT')}</h3><p class="small">${t('ctrlTxt')}</p>
+    ${[['online','cOnline'],['nfc','cNfc'],['intl','cIntl'],['roundup','roundT']].map(([k,l])=>`<label class="switch"><span>${t(l)}</span><input type="checkbox" ${c[k]?'checked':''} onchange="state.card.${k}=this.checked;render()"></label>`).join('')}
+  </div>
+  <div class="card"><h3>${t('payWith')}</h3><div class="seg">${src}</div><p class="small" style="line-height:1.5">${t('payTxt')}</p></div>
+  <div class="card"><h3>${t('walletT')}</h3><p class="small" style="line-height:1.5">${t('walletTxt')}</p>
+    ${!c.nfc?`<div class="alert warn">${t('offNfc')}</div>`:c.wallet?`<div class="alert ok">✓ ${t('added')}</div>`:`<div class="btns"><button class="b sec" onclick="addWallet()">${t('addApple')}</button><button class="b sec" onclick="addWallet()">${t('addGoogle')}</button></div>`}
+  </div>
+  <div class="card">
+    <h3>${t('roundT')} <span class="tag ${c.roundup?'ok':'pend'}">${c.roundup?'ON':'OFF'}</span></h3>
+    <p class="small" style="line-height:1.5">${t('roundTxt')}</p>
+    <select onchange="state.card.roundF=this.value">${FOUNDATIONS.filter(isVerified).map(f=>`<option value="${f.id}" ${f.id===c.roundF?'selected':''}>${f.name} (demo)</option>`).join('')}</select>
+  </div>
+  <div class="card"><h3>${t('simBuy')}</h3>
+    <div class="btns" style="flex-direction:column"><button class="b" onclick="buy(85000,'storeOn')">${t('buyOnline')}</button><button class="b sec" onclick="buy(12500,'storeNfc')">${t('buyNfc')}</button></div>
+  </div>
+  <div class="card"><h3>${t('moves')}</h3>${moves||`<p class="small">${t('noMoves')}</p>`}</div>
+  <p class="small" style="text-align:center;line-height:1.5">${t('cardNote')}</p>`;
+}
+function toggleShow(){ const c=state.card; c.shown=!c.shown; if(c.shown) c.cvv=String(Math.floor(100+Math.random()*900)); render(); }
+function addWallet(){ modal(`<h2>${t('walletT')}</h2><p class="small" style="font-size:13px;line-height:1.5">${t('walletModal')}</p><div class="btns"><button class="b" onclick="state.card.wallet=true;closeModal();render();toast(t('added'))">${t('confirm')}</button></div>`); }
+function buy(cop, store){
+  const c=state.card;
+  const deny = c.frozen?'blocked':(store==='storeOn'&&!c.online)?'offOnline':(store==='storeNfc'&&!c.nfc)?'offNfc':null;
+  if(deny){ c.moves.unshift({store,cop,paid:0,ccy:c.source,ok:false}); toast(t(deny)); render(); return; }
+  let paid, round=0, key=c.source.toLowerCase();
+  if(c.source==='COP') paid=cop; else if(c.source==='USDC') paid=cop/RATE.USD_COP; else paid=cop/RATE.CHF_COP;
+  if(c.roundup){ const chfEq=cop/RATE.CHF_COP; round=+(Math.ceil(chfEq)-chfEq).toFixed(2); if(round===0) round=1; }
+  if(state[key]<paid || (round && state.chf<round+(key==='chf'?paid:0))){ toast(t('insufficient')); return; }
+  state[key]-=paid;
+  if(round){ state.chf-=round; record(c.roundF, round, 'CHF', 'oRound'); }
+  c.moves.unshift({store,cop,paid,ccy:c.source,round,ok:true}); toast(t('bought')); render();
+}
+
+function viewLedger(){
+  const rows = state.ledger.map(e=>`<tr>
+    <td>${e.when.toLocaleDateString(state.lang==='es'?'es-CO':'en-US',{day:'2-digit',month:'short'})}</td>
+    <td>${fById(e.fid).name.replace('Fundación ','')}</td>
+    <td><b>${e.ccy==='COP'?fmtCOP(e.amount):fmt2(e.amount)}</b> ${e.ccy==='COP'?'':e.ccy}</td>
+    <td>${t(e.origin)}</td>
+    <td class="mono">${short(e.tx)}</td></tr>`).join('');
+  const totals = FOUNDATIONS.filter(isVerified).map(f=>{
+    const chf = state.ledger.filter(e=>e.fid===f.id&&e.ccy==='CHF').reduce((s,e)=>s+e.amount,0);
+    const usd = state.ledger.filter(e=>e.fid===f.id&&e.ccy==='USDC').reduce((s,e)=>s+e.amount,0);
+    const cop = state.ledger.filter(e=>e.fid===f.id&&e.ccy==='COP').reduce((s,e)=>s+e.amount,0);
+    return `<div class="bal"><span style="font-size:13px">${f.name}</span><b style="font-size:13px;text-align:right">${fmt2(chf)} CHF · ${fmt2(usd)} USDC<br>${fmtCOP(cop)}</b></div>`;
+  }).join('');
+  return `
+  <div class="card"><h2>${t('ledT')}</h2><p class="small" style="font-size:13px;line-height:1.5">${t('ledTxt')}</p></div>
+  <div class="card"><h3>${t('realT')}</h3><p class="small" style="font-size:13px;line-height:1.5">${t('realTxt')}</p><p class="small" style="font-size:13px;line-height:1.8"><a href="https://eth-sepolia.blockscout.com/tx/0xf175270769358bf393ae3b5e63698e6f256edb19a0ea2a27667fbcb88772610b" target="_blank" rel="noopener">${t('realTx')}</a> · <a href="https://eth-sepolia.blockscout.com/address/0x3509a1c1EA4fD27f95E1397a92fDA0872FFCa862" target="_blank" rel="noopener">${t('realC')}</a></p></div>
+  <div class="card">${state.ledger.length?`<table><tr><th>${t('thW')}</th><th>${t('thF')}</th><th>${t('thA')}</th><th>${t('thO')}</th><th>${t('thTx')}</th></tr>${rows}</table>`:`<p class="small">${t('none')}</p>`}</div>
+  <div class="card"><h3>${t('totals')}</h3>${totals}</div>`;
+}
+
+// ---------- Acciones ----------
+function setAddr(a){ state.give.addr=a; render(); }
+function pickF(id){ state.give.foundation=id; state.give.addr=''; render(); }
+function updateDonateBtn(){ const r=checkAddress(state.give.addr); const f=fById(state.give.foundation);
+  const ok = state.give.addr ? (r&&r.kind==='ok') : isVerified(f); const b=document.getElementById('donateBtn'); if(b) b.disabled=!ok; }
+function donate(){
+  const g=state.give; const r=g.addr?checkAddress(g.addr):{kind:'ok',f:fById(g.foundation)};
+  if(!r||r.kind!=='ok') return;
+  const bal = g.ccy==='CHF'?'chf':'usdc';
+  if(!(g.amount>0) || state[bal]<g.amount){ toast(t('insufficient')); return; }
+  state[bal]-=g.amount; record(r.f.id, g.amount, g.ccy, 'oUser'); toast(t('done')); state.give.sub='led'; render();
+}
+function simExt(){ const f=fById(state.give.foundation); record(f.id, 50, 'USDC', 'oExt'); toast(t('done')); state.give.sub='led'; render(); }
+function copyAddr(a){ try{ navigator.clipboard.writeText(a).then(()=>toast(t('copied')),()=>toast(a)); }catch(e){ toast(a); } }
+function movePocket(){ if(state.chf<20) return; state.chf-=20; state.pocket.chf+=20; toast(t('moved')); render(); }
+function moveUsd(){ if(state.usdc<20) return; state.usdc-=20; state.pocket.usd+=20; toast(t('moved')); render(); }
+function moveCop(){ if(state.cop<200000) return; state.cop-=200000; state.pocket.cop+=200000; toast(t('moved')); render(); }
+function simMonth(){
+  const p=state.pocket;
+  const yc = p.cop*(Math.pow(1+APY_COP,1/12)-1), dc = Math.round(yc*p.donatePct/100);
+  const yu = p.usd*(Math.pow(1+APY_USD,1/12)-1), du = +(yu*p.donatePct/100).toFixed(2);
+  p.cop += yc-dc; p.usd += yu-du; p.earned += yc + yu*RATE.USD_COP; p.months++;
+  if(dc>0) record(p.foundation, dc, 'COP', 'oAuto');
+  if(du>0) record(p.foundation, du, 'USDC', 'oAuto');
+  toast(t('month')); render();
+}
+function modal(html){ document.getElementById('modalCard').innerHTML=html; document.getElementById('modal').classList.add('show'); }
+function closeModal(){ document.getElementById('modal').classList.remove('show'); }
+document.getElementById('modal').addEventListener('click',e=>{ if(e.target.id==='modal') closeModal(); });
+function openTopup(){
+  modal(`<h2>${t('topupT')}</h2><label>${t('amountCop')}</label><input id="tAmt" type="number" value="200000" min="10000" step="10000">
+  <div class="btns"><button class="b sec" onclick="closeModal()">${t('cancel')}</button><button class="b" onclick="doTopup()">${t('confirm')}</button></div>`);
+}
+function doTopup(){ const v=+document.getElementById('tAmt').value; if(v>0){ state.cop+=v; toast(t('topped')); } closeModal(); render(); }
+function openConvert(){
+  modal(`<h2>${t('convT')}</h2>
+  <label>${t('from')}</label><select id="cFrom" onchange="convPreview()"><option value="cop">COP</option><option value="usdc">USDC</option></select>
+  <label>${t('amount')}</label><input id="cAmt" type="number" value="200000" oninput="convPreview()">
+  <div class="alert ok" id="cPrev"></div>
+  <div class="btns"><button class="b sec" onclick="closeModal()">${t('cancel')}</button><button class="b" onclick="doConvert()">${t('confirm')}</button></div>`);
+  convPreview();
+}
+function convCalc(){ const from=document.getElementById('cFrom').value, amt=+document.getElementById('cAmt').value||0;
+  const cop = from==='cop'?amt:amt*RATE.USD_COP; const fee=cop*FEE; return {from,amt,fee,chf:(cop-fee)/RATE.CHF_COP}; }
+function convPreview(){ const c=convCalc(); document.getElementById('cPrev').innerHTML=`${t('receive')} <b>${fmt2(c.chf)} CHF</b><br><span style="font-size:12px">${t('fee')}: ${fmtCOP(c.fee)}</span>`; }
+function doConvert(){ const c=convCalc(); if(c.amt<=0||state[c.from]<c.amt){ toast(t('insufficient')); return; }
+  state[c.from]-=c.amt; state.chf+=c.chf; toast(t('converted')); closeModal(); render(); }
+
+// ---------- Enviar dinero ----------
+let sendKind='user', sendPurpose='pay', sendRec='', sendAck=false;
+const UNKNOWN_ADDR='0x5B2e9A7c3D10f48E6b9C2a71D4e8F30b6C9a1E57';
+function openSend(){
+  const w=sendKind==='wallet';
+  modal(`<h2>${t('sendT')}</h2>
+  <div class="seg"><button id="sk-user" class="${!w?'on':''}" onclick="sendKind='user';sendRec='';openSend()">${t('toUser')}</button><button id="sk-wallet" class="${w?'on':''}" onclick="sendKind='wallet';sendRec='';openSend()">${t('toWallet')}</button></div>
+  ${w?`<label>${t('purposeQ')}</label>
+  <div class="seg"><button class="${sendPurpose==='pay'?'on':''}" onclick="setPurpose('pay')">${t('pPay')}</button><button class="${sendPurpose==='don'?'on':''}" onclick="setPurpose('don')">${t('pDon')}</button><button class="${sendPurpose==='other'?'on':''}" onclick="setPurpose('other')">${t('pOther')}</button></div>`:''}
+  <label>${w?t('recWallet'):t('recUser')}</label>
+  <input id="sRec" class="${w?'mono':''}" placeholder="${w?'0x…':'@paola.v / 300 123 4567'}" value="${sendRec}" oninput="sendRec=this.value;sendAck=false;sendCheck()">
+  ${w?`<div class="btns"><button class="b sec" onclick="fillSend(FOUNDATIONS[0].addr)">${t('tryVer')}</button><button class="b sec" onclick="fillSend(SCAM_ADDR)">${t('tryLook')}</button><button class="b sec" onclick="fillSend(UNKNOWN_ADDR)">${t('tryUnk')}</button></div>`:''}
+  <div class="row" style="gap:8px"><div style="flex:1"><label>${t('amount')}</label><input id="sAmt" type="number" min="1" value="${w?10:50000}"></div>
+  <div style="width:110px"><label>${t('ccy')}</label><select id="sCcy">${!w?'<option>COP</option>':''}<option>USDC</option><option>CHF</option></select></div></div>
+  <div id="sMsg" class="alert ${w?'warn':'ok'}">${w?t('sendChain'):t('sendFree')}</div>
+  <div id="sAct"></div>
+  <div class="btns"><button class="b sec" onclick="closeModal()">${t('cancel')}</button><button class="b" id="sBtn" onclick="doSend()">${t('sendBtn')}</button></div>`);
+  sendCheck();
+}
+function setPurpose(p){ sendPurpose=p; sendAck=false; openSend(); }
+function fillSend(a){ sendRec=a; sendAck=false; openSend(); }
+function goDonate(fid){ const f=fById(fid); closeModal(); state.tab='give'; state.give.sub='found'; state.give.foundation=fid; state.give.addr=f.addr; render(); document.getElementById('view').scrollTop=0; }
+function goGive(){ closeModal(); state.tab='give'; state.give.sub='found'; render(); document.getElementById('view').scrollTop=0; }
+function sendCheck(){
+  if(sendKind!=='wallet') return;
+  const a=sendRec.trim(), m=document.getElementById('sMsg'), b=document.getElementById('sBtn'), act=document.getElementById('sAct');
+  act.innerHTML=''; b.disabled=false;
+  if(!a){ m.className='alert warn'; m.textContent=t('sendChain'); return; }
+  if(!/^0x[0-9a-fA-F]{40}$/.test(a)){ m.className='alert bad'; m.textContent=t('badFmt'); b.disabled=true; return; }
+  const r=checkAddress(a);
+  if(r.kind==='ok'){ m.className='alert ok'; m.innerHTML=t('isVer').replace('{f}','<b>'+r.f.name+'</b>'); act.innerHTML=`<div class="btns"><button class="b" onclick="goDonate('${r.f.id}')">${t('donBtn')}</button></div>`; return; }
+  if(r.kind==='pend'){ m.className='alert warn'; m.innerHTML=t('isPend').replace('{f}','<b>'+r.f.name+'</b>'); return; }
+  if(r.kind==='look'){ m.className='alert bad'; m.innerHTML='⚠ '+t('lookalike').replace('{f}','<b>'+r.f.name+'</b>'); b.disabled=true; return; }
+  if(sendPurpose==='don'){
+    m.className='alert bad'; m.textContent=t('notVerDon');
+    act.innerHTML=`<div class="btns"><button class="b sec" onclick="goGive()">${t('findBtn')}</button></div><div style="display:flex;gap:8px;align-items:flex-start;font-size:13px;margin-top:8px"><input type="checkbox" id="sAck" ${sendAck?'checked':''} onchange="sendAck=this.checked;document.getElementById('sBtn').disabled=!sendAck" style="width:auto;margin-top:2px"><span>${t('ackTxt')}</span></div>`;
+    b.disabled=!sendAck; return;
+  }
+  m.className='alert warn'; m.textContent=t('sendChain');
+}
+function doSend(){
+  const to=(sendKind==='wallet'?sendRec:document.getElementById('sRec').value).trim(), amt=+document.getElementById('sAmt').value, ccy=document.getElementById('sCcy').value;
+  if(!to){ toast(t('needRec')); return; }
+  if(sendKind==='wallet' && !/^0x[0-9a-fA-F]{40}$/.test(to)){ toast(t('badFmt')); return; }
+  const key=ccy.toLowerCase(); if(!(amt>0)||state[key]<amt){ toast(t('insufficient')); return; }
+  state[key]-=amt; state.sends.unshift({to: sendKind==='wallet'?short(to):to, kind:sendKind, amount:amt, ccy});
+  sendRec=''; sendAck=false; closeModal(); toast(t('sent')); render();
+}
+
+// ---------- Render ----------
+function render(){
+  document.documentElement.lang=state.lang;
+  document.querySelectorAll('[data-t]').forEach(el=>el.textContent=t(el.dataset.t));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===state.tab));
+  const v={home:viewHome,save:viewSave,card:viewCard,give:viewGive}[state.tab];
+  document.getElementById('view').innerHTML=v();
+}
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{state.tab=b.dataset.tab;render();document.getElementById('view').scrollTop=0;}));
+document.getElementById('l-es').onclick=()=>{state.lang='es';document.getElementById('l-es').classList.add('on');document.getElementById('l-en').classList.remove('on');render();};
+document.getElementById('l-en').onclick=()=>{state.lang='en';document.getElementById('l-en').classList.add('on');document.getElementById('l-es').classList.remove('on');render();};
+render();
+</script>
+</body>
+</html>

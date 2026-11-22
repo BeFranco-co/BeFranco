@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BeFranco · Verificador público de fundaciones</title>
+<meta name="description" content="Consulta gratis si una dirección pertenece a una fundación verificada por BeFranco. La página lee el contrato directamente en la blockchain.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#18202b;--paper:#f5f3ee;--white:#fff;--red:#c8102e;--red-soft:#fbe9ec;--muted:#5b6470;--line:#e2ded5;--green:#1d6b45;--green-soft:#e3f2ea;--amber:#8a5a00;--amber-soft:#fdf1d8}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Manrope,system-ui,Arial,sans-serif;color:var(--ink);background:var(--paper);line-height:1.55}
+  a{color:var(--red)}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+  header{padding:22px 0;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;text-decoration:none;color:var(--ink)}
+  .mark{width:30px;height:30px;border-radius:8px;background:var(--red);display:grid;place-items:center;color:#fff;font-size:16px}
+  nav a{margin-left:18px;font-weight:700;font-size:15px;text-decoration:none}
+  .hero{padding:28px 0 24px}
+  .hero h1{font-size:clamp(30px,4.6vw,46px);line-height:1.1;margin:0 0 14px;font-weight:800;max-width:820px}
+  .hero p{font-size:18px;color:var(--muted);max-width:700px;margin:0}
+  .panel{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:24px;margin:0 0 28px}
+  .search{display:flex;gap:10px;flex-wrap:wrap}
+  .search input{flex:1 1 420px;min-width:0;font:inherit;font-size:16px;padding:13px 16px;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+  .search input:focus{outline:2px solid var(--red);outline-offset:1px}
+  button{font:inherit;font-weight:700;font-size:16px;padding:13px 22px;border-radius:12px;border:0;background:var(--red);color:#fff;cursor:pointer}
+  button.ghost{background:var(--white);color:var(--ink);border:1px solid var(--line)}
+  button:disabled{opacity:.6;cursor:wait}
+  .hint{font-size:14px;color:var(--muted);margin:10px 0 0}
+  .result{margin-top:18px;border-radius:14px;padding:18px 20px;display:none}
+  .result.show{display:block}
+  .result h3{margin:0 0 6px;font-size:19px}
+  .result p{margin:4px 0 0;font-size:15px}
+  .result.ok{background:var(--green-soft);color:var(--green)}
+  .result.warn{background:var(--amber-soft);color:var(--amber)}
+  .result.bad{background:var(--red-soft);color:var(--red)}
+  .result.info{background:var(--paper);color:var(--ink)}
+  .result .detail{color:var(--ink);opacity:.85}
+  .result ul{margin:8px 0 0;padding-left:20px;font-size:15px}
+  .result .mono{word-break:break-all}
+  h2{font-size:24px;margin:0 0 6px}
+  .lead{color:var(--muted);margin:0 0 16px;font-size:15px}
+  .tablewrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  th{text-align:left;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:8px 10px;border-bottom:2px solid var(--line);white-space:nowrap}
+  td{padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr:last-child td{border-bottom:0}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+  .pill{display:inline-block;font-size:12px;font-weight:800;padding:3px 10px;border-radius:999px;white-space:nowrap}
+  .p-ok{background:var(--green-soft);color:var(--green)}
+  .p-warn{background:var(--amber-soft);color:var(--amber)}
+  .p-bad{background:var(--red-soft);color:var(--red)}
+  .reg{margin:0 0 22px}
+  .reg h3{font-size:16px;margin:0 0 4px}
+  .reg .meta{font-size:13px;color:var(--muted);margin:0 0 8px}
+  .loading{color:var(--muted);font-size:15px}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:0 0 28px}
+  .step{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:20px}
+  .step b{display:block;color:var(--red);font-size:12px;letter-spacing:1.4px;margin:0 0 6px}
+  .step p{margin:0;font-size:15px;color:var(--muted)}
+  .file{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:14px}
+  footer{border-top:1px solid var(--line);padding:24px 0 40px;font-size:14px;color:var(--muted)}
+  footer p{margin:0 0 8px}
+  @media (max-width:760px){.steps{grid-template-columns:1fr}nav a{margin:0 14px 0 0}}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <a class="brand" href="index.html"><div class="mark">B</div>BeFranco</a>
+  <nav><a href="index.html">Inicio</a><a href="prototipo.html">Prototipo</a><a href="docs/Evidencias_MVP_BeFranco.pdf">Evidencias</a></nav>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <h1>Verificador público de fundaciones</h1>
+    <p>Antes de donar desde cualquier billetera, pega aquí la dirección que te dieron. La página consulta directamente el contrato de BeFranco en la blockchain, desde tu navegador: no pasa por servidores nuestros y nadie puede alterar la respuesta.</p>
+  </div>
+
+  <div class="panel">
+    <form class="search" id="form">
+      <input id="q" type="text" autocomplete="off" spellcheck="false" placeholder="Dirección 0x… o nombre de la fundación" aria-label="Dirección o nombre de la fundación">
+      <button id="go" type="submit">Verificar</button>
+    </form>
+    <p class="hint">Prueba con la dirección de una fundación del registro de abajo, o con <a href="#" id="ex-dead">una dirección que nunca confirmó su billetera</a>.</p>
+    <div class="result" id="result" role="status" aria-live="polite"></div>
+  </div>
+
+  <div class="steps">
+    <div class="step"><b>1 · REVISAMOS</b><p>BeFranco revisa los documentos legales de la fundación y la registra con la huella (hash) de esos documentos.</p></div>
+    <div class="step"><b>2 · LA FUNDACIÓN FIRMA</b><p>La fundación confirma desde su propia billetera que la controla. Sin esa firma, el contrato no le deja recibir donaciones.</p></div>
+    <div class="step"><b>3 · CUALQUIERA CONSULTA</b><p>Esta página lee el estado en la blockchain. Si una fundación pierde el sello, la respuesta cambia al instante.</p></div>
+  </div>
+
+  <section class="panel">
+    <h2>Registro de fundaciones</h2>
+    <p class="lead">Todas las fundaciones registradas en los contratos de BeFranco, leídas en este momento de la red.</p>
+    <div id="registry"><p class="loading">Consultando la red…</p></div>
+  </section>
+
+  <section class="panel" id="fiat-panel" hidden>
+    <h2>Donaciones en pesos</h2>
+    <p class="lead">El dinero en pesos viaja por el banco. En la blockchain queda la huella del comprobante y la confirmación de la fundación, firmada desde su billetera.</p>
+    <div id="fiat"></div>
+    <h3 style="font-size:16px;margin:22px 0 4px">Comprueba un comprobante</h3>
+    <p class="lead" style="margin:0">Elige el archivo del comprobante. Tu navegador calcula su huella (SHA-256) sin subirlo a ningún lado y la compara con las registradas. Puedes probar con el <a href="docs/Comprobante_prueba_BeFranco.pdf" download>comprobante de prueba</a>.</p>
+    <div class="file"><input type="file" id="receipt" aria-label="Archivo del comprobante"></div>
+    <div class="result" id="receipt-result" role="status" aria-live="polite"></div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <p><strong>Estado:</strong> prototipo no auditado en la red de prueba Ethereum Sepolia. Las fundaciones y los montos son de demostración.</p>
+  <p id="netinfo">Red: Ethereum Sepolia.</p>
+  <p><a href="index.html">BeFranco</a> · <a href="https://github.com/" id="repo">Código en GitHub</a></p>
+</footer>
+
+<script>
+/* ============================================================
+   CONFIGURACIÓN
+   Cada contrato de BeFranco desplegado en Sepolia. Si "address"
+   está vacío, ese registro no se consulta.
+   ============================================================ */
+var REGISTROS = [
+  { id: "v1", nombre: "Contrato v1 · donaciones en tokens", address: "0x3509a1c1EA4fD27f95E1397a92fDA0872FFCa862", pesos: false },
+  { id: "v2", nombre: "Contrato v2 · con ruta en pesos", address: "0xCcef9b76E5E1E7c929b730f24ae3866935232629", pesos: true }
+];
+var EXPLORER = "https://eth-sepolia.blockscout.com";
+var RPCS = [
+  "https://ethereum-sepolia-rpc.publicnode.com",
+  "https://sepolia.drpc.org",
+  "https://eth-sepolia.blockscout.com/api/eth-rpc",
+  "https://rpc.sepolia.org"
+];
+var DEAD = "0x000000000000000000000000000000000000dEaD";
+
+// Selectores de las funciones del contrato (primeros 4 bytes del keccak-256 de la firma).
+var SEL = {
+  foundationCount: "0x7280a278",   // foundationCount()
+  foundations: "0x1d2bf028",       // foundations(uint256)
+  isVerifiedWallet: "0x61bf4b3a",  // isVerifiedWallet(address)
+  fiatDonationCount: "0x684b864c", // fiatDonationCount()
+  fiatDonations: "0x3b24371b",     // fiatDonations(uint256)
+  fiatReceivedCop: "0x20456d45"    // fiatReceivedCop(uint256)
+};
+var ESTADOS = ["Sin registro", "Pendiente", "Verificada", "Revocada"];
+
+/* ---------- Conexión a la red ---------- */
+var rpcIdx = 0, rpcUsed = "";
+async function rpc(method, params) {
+  var lastErr;
+  for (var k = 0; k < RPCS.length; k++) {
+    var i = (rpcIdx + k) % RPCS.length, url = RPCS[i];
+    try {
+      var ctrl = new AbortController(), timer = setTimeout(function () { ctrl.abort(); }, 9000);
+      var r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: method, params: params }), signal: ctrl.signal });
+      clearTimeout(timer);
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      var j = await r.json();
+      if (j.error) throw new Error(j.error.message || "error de la red");
+      rpcIdx = i; rpcUsed = url;
+      return j.result;
+    } catch (e) { lastErr = e; }
+  }
+  throw lastErr || new Error("sin conexión");
+}
+async function call(to, data) {
+  var res = await rpc("eth_call", [{ to: to, data: data }, "latest"]);
+  if (!res || res === "0x") throw new Error("El contrato no respondió");
+  return res;
+}
+
+/* ---------- Codificación ABI mínima ---------- */
+function strip(h) { return h.replace(/^0x/, ""); }
+function u256(n) { return BigInt(n).toString(16).padStart(64, "0"); }
+function addrArg(a) { return strip(a).toLowerCase().padStart(64, "0"); }
+function words(h) { h = strip(h); var w = []; for (var i = 0; i < h.length; i += 64) w.push(h.slice(i, i + 64)); return w; }
+function big(w) { return BigInt("0x" + w); }
+function addr(w) { return "0x" + w.slice(24); }
+function str(h, offsetWord) {
+  h = strip(h);
+  var o = Number(big(offsetWord)) * 2, len = Number(big(h.slice(o, o + 64)));
+  var hex = h.slice(o + 64, o + 64 + len * 2), bytes = new Uint8Array(len);
+  for (var i = 0; i < len; i++) bytes[i] = parseInt(hex.substr(i * 2, 2), 16);
+  return new TextDecoder().decode(bytes);
+}
+
+async function getFoundation(reg, id) {
+  var h = await call(reg.address, SEL.foundations + u256(id)), w = words(h);
+  return { id: id, name: str(h, w[0]), nit: str(h, w[1]), docsHash: "0x" + w[2], wallet: addr(w[3]),
+           status: Number(big(w[4])), totalReceived: big(w[5]) };
+}
+async function loadRegistry(reg) {
+  var count = Number(big(words(await call(reg.address, SEL.foundationCount))[0]));
+  var ids = []; for (var i = 1; i <= count; i++) ids.push(i);
+  reg.foundations = await Promise.all(ids.map(function (id) { return getFoundation(reg, id); }));
+  if (reg.pesos) {
+    await Promise.all(reg.foundations.map(async function (f) {
+      f.fiatCop = big(words(await call(reg.address, SEL.fiatReceivedCop + u256(f.id)))[0]);
+    }));
+    var n = Number(big(words(await call(reg.address, SEL.fiatDonationCount))[0]));
+    var dIds = []; for (var d = 1; d <= n; d++) dIds.push(d);
+    reg.fiat = await Promise.all(dIds.map(async function (id) {
+      var w = words(await call(reg.address, SEL.fiatDonations + u256(id)));
+      return { id: id, foundationId: Number(big(w[0])), amountCop: big(w[1]), receiptHash: "0x" + w[2],
+               recordedAt: Number(big(w[3])), status: Number(big(w[4])) };
+    }));
+  }
+  return reg;
+}
+
+/* ---------- Presentación ---------- */
+function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+function short(a) { return a.slice(0, 6) + "…" + a.slice(-4); }
+function addrLink(a) { return '<a class="mono" href="' + EXPLORER + "/address/" + a + '" target="_blank" rel="noopener">' + short(a) + "</a>"; }
+function pill(status) { var c = status === 2 ? "p-ok" : status === 1 ? "p-warn" : "p-bad"; return '<span class="pill ' + c + '">' + ESTADOS[status] + "</span>"; }
+function cop(n) { return "$" + Number(n).toLocaleString("es-CO") + " COP"; }
+function tchf(n) { var v = Number(n) / 1e6; return v ? v.toLocaleString("es-CO") + " tCHF" : "—"; }
+function fecha(ts) { return new Date(ts * 1000).toLocaleString("es-CO", { timeZone: "America/Bogota", dateStyle: "medium", timeStyle: "short" }); }
+function norm(s) { return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); }
+function nameById(reg, id) { var f = (reg.foundations || []).filter(function (x) { return x.id === id; })[0]; return f ? f.name : "n.º " + id; }
+
+function renderRegistry() {
+  var html = "";
+  activos().forEach(function (reg) {
+    html += '<div class="reg"><h3>' + esc(reg.nombre) + '</h3><p class="meta">Contrato ' + addrLink(reg.address) + "</p>";
+    if (reg.error) { html += '<p class="loading">No pudimos leer este contrato: ' + esc(reg.error) + "</p></div>"; return; }
+    html += '<div class="tablewrap"><table><tr><th>N.º</th><th>Fundación</th><th>NIT</th><th>Billetera</th><th>Estado</th><th>Recibido en tokens</th>' +
+            (reg.pesos ? "<th>Pesos confirmados</th>" : "") + "</tr>";
+    reg.foundations.forEach(function (f) {
+      html += "<tr><td>" + f.id + "</td><td><strong>" + esc(f.name) + "</strong></td><td>" + esc(f.nit) + "</td><td>" + addrLink(f.wallet) +
+              "</td><td>" + pill(f.status) + "</td><td>" + tchf(f.totalReceived) + "</td>" + (reg.pesos ? "<td>" + (f.fiatCop ? cop(f.fiatCop) : "—") + "</td>" : "") + "</tr>";
+    });
+    if (!reg.foundations.length) html += '<tr><td colspan="7">Todavía no hay fundaciones registradas.</td></tr>';
+    html += "</table></div></div>";
+  });
+  document.getElementById("registry").innerHTML = html || '<p class="loading">No hay contratos configurados.</p>';
+
+  var fiatRegs = activos().filter(function (r) { return r.pesos && !r.error; });
+  if (fiatRegs.length) {
+    var fh = "";
+    fiatRegs.forEach(function (reg) {
+      fh += '<div class="tablewrap"><table><tr><th>N.º</th><th>Fundación</th><th>Monto</th><th>Registrada</th><th>Estado</th><th>Huella del comprobante</th></tr>';
+      reg.fiat.forEach(function (d) {
+        var st = d.status === 2 ? '<span class="pill p-ok">Confirmada por la fundación</span>' : '<span class="pill p-warn">Esperando confirmación</span>';
+        fh += "<tr><td>" + d.id + "</td><td>" + esc(nameById(reg, d.foundationId)) + "</td><td>" + cop(d.amountCop) + "</td><td>" + fecha(d.recordedAt) +
+              "</td><td>" + st + '</td><td class="mono" title="' + d.receiptHash + '">' + short(d.receiptHash) + "</td></tr>";
+      });
+      if (!reg.fiat.length) fh += '<tr><td colspan="6">Todavía no hay donaciones en pesos registradas.</td></tr>';
+      fh += "</table></div>";
+    });
+    document.getElementById("fiat").innerHTML = fh;
+    document.getElementById("fiat-panel").hidden = false;
+  }
+}
+
+function showResult(el, kind, title, body) {
+  el.className = "result show " + kind;
+  el.innerHTML = "<h3>" + title + "</h3>" + (body || "");
+}
+
+/* ---------- Consulta ---------- */
+var listo = null;
+function activos() { return REGISTROS.filter(function (r) { return r.address; }); }
+
+async function cargar() {
+  await Promise.all(activos().map(function (reg) {
+    return loadRegistry(reg).catch(function (e) { reg.error = e.message; });
+  }));
+  renderRegistry();
+  try {
+    var b = parseInt(await rpc("eth_blockNumber", []), 16);
+    document.getElementById("netinfo").textContent = "Red: Ethereum Sepolia · datos leídos en el bloque " + b.toLocaleString("es-CO") + " · nodo público " + new URL(rpcUsed).hostname + ".";
+  } catch (e) {}
+}
+
+async function verificar(q) {
+  var out = document.getElementById("result"), btn = document.getElementById("go");
+  q = q.trim();
+  if (!q) return;
+  btn.disabled = true;
+  showResult(out, "info", "Consultando la red…");
+  try {
+    if (/^0x[0-9a-fA-F]{40}$/.test(q)) {
+      var hallazgos = [];
+      for (var reg of activos()) {
+        var w = words(await call(reg.address, SEL.isVerifiedWallet + addrArg(q)));
+        var verified = big(w[0]) === 1n, id = Number(big(w[1]));
+        if (id) hallazgos.push({ reg: reg, verified: verified, f: await getFoundation(reg, id) });
+      }
+      var ok = hallazgos.filter(function (h) { return h.verified; });
+      if (ok.length) {
+        var f = ok[0].f;
+        showResult(out, "ok", "✓ Fundación verificada: " + esc(f.name),
+          '<p class="detail">NIT ' + esc(f.nit) + " · fundación n.º " + f.id + " del " + esc(ok[0].reg.nombre.toLowerCase()) + ".</p>" +
+          '<p class="detail">Huella de los documentos revisados: <span class="mono">' + short(f.docsHash) + "</span>. La fundación confirmó esta billetera con su propia firma.</p>");
+      } else if (hallazgos.length) {
+        var h = hallazgos[0];
+        if (h.f.status === 3) showResult(out, "bad", "✕ Sello retirado: " + esc(h.f.name), '<p class="detail">BeFranco revocó la verificación de esta fundación. No dones a esta dirección.</p>');
+        else showResult(out, "warn", "! Registrada, pero sin confirmar: " + esc(h.f.name),
+          '<p class="detail">La fundación todavía no ha firmado desde esta billetera para demostrar que la controla. El contrato no deja donarle hasta que lo haga.</p>');
+      } else {
+        showResult(out, "bad", "✕ Esta dirección no está en el registro de BeFranco",
+          '<p class="detail">No corresponde a ninguna fundación verificada por nosotros. Si alguien te la dio como cuenta de una fundación, confírmala directamente con la fundación antes de donar.</p>');
+      }
+    } else if (/^0x/i.test(q)) {
+      showResult(out, "bad", "Esa dirección no está completa", '<p class="detail">Una dirección tiene 42 caracteres: 0x seguido de 40 letras y números.</p>');
+    } else {
+      await listo;
+      var nq = norm(q), m = [];
+      activos().forEach(function (reg) { (reg.foundations || []).forEach(function (f) { if (norm(f.name).indexOf(nq) >= 0 || norm(f.nit).indexOf(nq) >= 0) m.push({ reg: reg, f: f }); }); });
+      if (!m.length) showResult(out, "bad", "No encontramos fundaciones con ese nombre", '<p class="detail">Revisa la ortografía o busca por la dirección de la billetera.</p>');
+      else showResult(out, "info", m.length === 1 ? "Encontramos 1 fundación" : "Encontramos " + m.length + " fundaciones",
+        "<ul>" + m.map(function (x) { return "<li><strong>" + esc(x.f.name) + "</strong> (NIT " + esc(x.f.nit) + ") · " + pill(x.f.status) + " · billetera " + addrLink(x.f.wallet) + " · " + esc(x.reg.nombre) + "</li>"; }).join("") + "</ul>");
+    }
+  } catch (e) {
+    showResult(out, "bad", "No pudimos conectarnos a la red", '<p class="detail">Revisa tu conexión e intenta de nuevo en unos segundos.</p>');
+  }
+  btn.disabled = false;
+}
+
+async function comprobar(file) {
+  var out = document.getElementById("receipt-result");
+  showResult(out, "info", "Calculando la huella…");
+  var digest = await crypto.subtle.digest("SHA-256", await file.arrayBuffer());
+  var hex = "0x" + Array.from(new Uint8Array(digest)).map(function (b) { return b.toString(16).padStart(2, "0"); }).join("");
+  await listo;
+  var match = null;
+  activos().forEach(function (reg) { (reg.fiat || []).forEach(function (d) { if (d.receiptHash.toLowerCase() === hex) match = { reg: reg, d: d }; }); });
+  if (match) showResult(out, "ok", "✓ El comprobante coincide con la donación en pesos n.º " + match.d.id,
+    '<p class="detail">' + cop(match.d.amountCop) + " para " + esc(nameById(match.reg, match.d.foundationId)) + ". Huella: <span class=\"mono\">" + hex + "</span></p>");
+  else showResult(out, "bad", "✕ Este archivo no coincide con ningún comprobante registrado",
+    '<p class="detail">Su huella es <span class="mono">' + hex + "</span>. Si el archivo se modificó, aunque sea en un carácter, la huella cambia por completo.</p>");
+}
+
+document.getElementById("form").addEventListener("submit", function (e) { e.preventDefault(); verificar(document.getElementById("q").value); });
+document.getElementById("ex-dead").addEventListener("click", function (e) { e.preventDefault(); document.getElementById("q").value = DEAD; verificar(DEAD); });
+document.getElementById("receipt").addEventListener("change", function (e) { if (e.target.files[0]) comprobar(e.target.files[0]); });
+
+listo = cargar();
+var pre = new URLSearchParams(location.search).get("q");
+if (pre) { document.getElementById("q").value = pre; verificar(pre); }
+
+var host = location.hostname, parts = location.pathname.split("/").filter(Boolean);
+if (host.endsWith("github.io") && parts.length) document.getElementById("repo").href = "https://github.com/" + host.split(".")[0] + "/" + parts[0];
+</script>
+</body>
+</html>
